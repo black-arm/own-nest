@@ -1,13 +1,16 @@
 {
-  "name": "${PROJECT_NAME}",
+  "name": "own-nest",
   "version": "1.0.0",
-  "description": "",
+  "description": "my own backend projects",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:dev": "npm run build && npm run start"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@types/node": "^22.10.1",
+    "reflect-metadata": "^0.2.2",
     "typescript": "^5.5.3"
   },
   "private": true

@@ -1,1 +1,2 @@
-console.log('Happy developing ✨')
+import "reflect-metadata"
+export * from './server/server'; 
