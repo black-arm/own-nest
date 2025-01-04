@@ -9,6 +9,7 @@ Own Nest is a backend project built using TypeScript and Node.js. It aims to pro
 - **src/models/route.model.ts**: Defines the `Route` interface and related types used to represent routes in the application.
 - **src/decorators/define-routes.ts**: Provides decorators (`Get`, `Post`, `Put`, `Delete`) to define routes and associate them with controller methods.
 - **src/decorators/query-param.ts**: Defines the `QueryParam` decorator to extract query parameters from the request URL.
+- **src/decorators/payload.ts**: Define the `Payload`decorator to extract request payload.
 - **src/server/server.ts**: Sets up the HTTP server and defines the logic to handle incoming requests by matching them to the defined routes and invoking the appropriate controller methods.
 
 ## Why This Project
