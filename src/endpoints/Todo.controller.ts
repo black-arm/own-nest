@@ -1,5 +1,6 @@
-import { Controller, Get } from "../decorators";
+import { Controller, Get, Post } from "../decorators";
 import { InjectService } from "../decorators/inject-service";
+import { Payload } from "../decorators/payload";
 import { TodoService } from "../services/todo-service";
 
 @Controller('/todo')
@@ -10,8 +11,11 @@ export class TodoController {
 
     @Get('')
     getTodo(){
-        console.log(`${this.todoService}`);
         return this.todoService.getTodos();
     }
     
+    @Post('/add-todo')
+    addTodo(@Payload() payload: {text: string}){
+        this.todoService.addTodo(payload.text);
+    }
 }

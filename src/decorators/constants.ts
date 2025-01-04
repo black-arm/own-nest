@@ -10,5 +10,6 @@ export const SERVICE = 'service';
 export const INJECT_SERVICE = 'inject:service';
 export const INJECT_PROPERTY = 'inject:property';
 export const MODULE = 'module';
+export const PAYLOAD = 'payload';
 
 export type Method = 'get' | 'post' | 'put' | 'delete';

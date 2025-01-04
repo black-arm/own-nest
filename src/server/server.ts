@@ -1,5 +1,5 @@
 import {createServer, IncomingMessage, ServerResponse} from 'node:http';
-import {CONTROLLER, MODULE, QUERY_PARAM, ROUTE} from "../decorators/constants";
+import {CONTROLLER, MODULE, PAYLOAD, QUERY_PARAM, ROUTE} from "../decorators/constants";
 import { Module } from '../module';
 import { ModuleMetadataFactory } from '../models';
 
@@ -13,26 +13,38 @@ server.listen(3000, '127.0.0.1', () =>{
     console.log('server running on port: 3000!!!')
 })
 
-function defineRoutes(req: IncomingMessage, res: ServerResponse) {
+async function defineRoutes(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
     
     const controllers = moduleMetadataFactory.controllers;
+    
+    let foundUrl = false;
 
     controllers.forEach((controller, key) => {
 
         const prefix = Reflect.getMetadata(CONTROLLER, key);
         const routes = Reflect.getMetadata(ROUTE, key) || [];
 
-        routes.forEach((route: {method: string, path: string, handler: string}) => {
+        routes.forEach(async (route: {method: string, path: string, handler: string}) => {
             const { method, path, handler } = route;
             const url = `${prefix}${path}`;
 
             const queryParams = Reflect.getMetadata(QUERY_PARAM, controller, handler) || [];
 
+            const payload = Reflect.getMetadata(PAYLOAD, controller, handler) || [];
+
             if (req.url === url && req.method === method.toUpperCase()) {
-                let args: (string | undefined)[] = [];
+                
+                foundUrl = true;
+                
+                let args: (string | undefined | any)[] = [];
                 if (queryParams.length > 0) {
                     args = extractQueryParamsFromPath(queryParams, url, req);
+                }
+
+                if(payload.length > 0) {
+                    let body = await getRequestBody(req);
+                    args = [...args, body];
                 }
 
                 res.writeHead(200, {'Content-Type': 'application/json'});
@@ -41,6 +53,11 @@ function defineRoutes(req: IncomingMessage, res: ServerResponse) {
             }
         });
     });
+
+    if(!foundUrl) {
+        res.writeHead(404, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({message: `url: ${req.url} not found`}));
+    }
 }
 
 function extractQueryParamsFromPath(
@@ -71,4 +88,23 @@ function extractQueryParamsFromPath(
     }
 
     return args;
+}
+
+async function getRequestBody(req: IncomingMessage): Promise<any> {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk;
+        });
+        req.on('end', () => {
+            try {
+                resolve(JSON.parse(body));
+            } catch (error) {
+                reject(error);
+            }
+        });
+        req.on('error', (error) => {
+            reject(error);
+        });
+    });
 }
